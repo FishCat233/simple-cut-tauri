@@ -1,50 +1,55 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
+import Nav, { NavConfig } from "./components/nav";
 import "./App.css";
+import IndexPage from "./pages";
+import ExportPage from "./pages/export";
+import GuidePage from "./pages/guide";
+import AboutPage from "./pages/about";
+import { Flex } from "antd";
+
+const navConfig: NavConfig = [
+  {
+    title: '素材设置',
+    id: 'index',
+    page: IndexPage,
+  },
+  {
+    title: '导出设置',
+    id: 'export',
+    page: ExportPage,
+  },
+  {
+    title: "使用说明",
+    id: 'guide',
+    page: GuidePage,
+  },
+  {
+    title: '关于',
+    id: 'about',
+    page: AboutPage,
+  },
+]
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [activeNavId, setActiveNavId] = useState('index');
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+  // 处理导航项变化的回调函数
+  const handleNavChange = (id: string) => {
+    setActiveNavId(id);
+    console.log('当前激活的导航项ID:', id);
+    // 在这里可以根据需要执行其他逻辑
+  };
 
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <Flex vertical className="h-screen w-screen overflow-hidden">
+      <Nav config={navConfig} onActiveChange={handleNavChange} />
+      <div className="flex-1 overflow-auto p-4">
+        {(() => {
+          const Page = navConfig.find(item => item.id === activeNavId)?.page;
+          return Page ? <Page /> : null;
+        })()}
       </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+    </Flex>
   );
 }
 
