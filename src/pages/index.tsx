@@ -2,36 +2,14 @@
 import { useState } from 'react'
 import { Table, Input, Button, Space, message, Flex } from 'antd'
 import type { ColumnType } from 'antd/es/table'
+import { FileItem } from '../App'
 
-interface FileItem {
-  key: string
-  order: number
-  fileName: string
-  duration: string
-  startTime: string
-  endTime: string
+interface IndexPageProps {
+  fileList: FileItem[]
+  setFileList: React.Dispatch<React.SetStateAction<FileItem[]>>
 }
 
-function IndexPage() {
-  // 表格数据状态
-  const [fileList, setFileList] = useState<FileItem[]>([
-    {
-      key: '1',
-      order: 1,
-      fileName: '示例视频1.mp4',
-      duration: '00:10:30',
-      startTime: '00:00:00',
-      endTime: '00:01:00'
-    },
-    {
-      key: '2',
-      order: 2,
-      fileName: '示例视频2.mp4',
-      duration: '00:05:20',
-      startTime: '00:00:30',
-      endTime: '00:02:15'
-    }
-  ])
+function IndexPage({ fileList, setFileList }: IndexPageProps) {
 
 
 
@@ -112,6 +90,7 @@ function IndexPage() {
       key: Date.now().toString(),
       order: fileList.length + 1,
       fileName: `新视频${fileList.length + 1}.mp4`,
+      filePath: `D:\\Videos\\新视频${fileList.length + 1}.mp4`,
       duration: '00:00:00',
       startTime: '00:00:00',
       endTime: '00:00:00'
@@ -119,7 +98,7 @@ function IndexPage() {
 
     setFileList([...fileList, newFile])
     message.success('已添加新文件')
-    // 实际实现时，这里可以打开文件选择对话框
+    // 实际实现时，这里可以打开文件选择对话框，获取真实的文件路径
   }
 
   // 移除文件
