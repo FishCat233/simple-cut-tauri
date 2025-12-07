@@ -11,6 +11,8 @@ type NavItem = {
 
 type NavProps = {
   config: NavConfig
+  className?: string
+  style?: React.CSSProperties
   onActiveChange?: (activeId: string) => void
 }
 
@@ -26,7 +28,9 @@ function Nav(prop: NavProps) {
 
   return (
     <Flex justify="center" align="center" gap={30}
-      className="p-2">
+      className={`p-2 ${prop.className || ''}`}
+      style={prop.style}
+    >
       {prop.config.map((item) => (
         <div className="font-bold font-size-1.4rem select-none"
           style={{

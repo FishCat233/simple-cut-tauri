@@ -75,8 +75,8 @@ function App() {
 
   return (
     <Flex vertical className="h-screen w-screen overflow-hidden">
-      <Nav config={navConfig} onActiveChange={handleNavChange} />
-      <div className="flex-1 overflow-auto p-4">
+      <Nav className={"h-6% p-5"} config={navConfig} onActiveChange={handleNavChange} />
+      <div className="flex-1 overflow-auto p-4 h-93%">
         {(() => {
           const Page = navConfig.find(item => item.id === activeNavId)?.page;
           return Page ? <Page /> : null;
