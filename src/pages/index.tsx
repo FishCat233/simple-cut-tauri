@@ -1,25 +1,18 @@
 
 import { useState } from 'react'
-import { Table, Input, Button, Space, message, Flex } from 'antd'
+import { Table, Input, Button, Space, message } from 'antd'
 import type { ColumnType } from 'antd/es/table'
-import { FileItem } from '../App'
+import { useAppStore, FileItem } from '../store'
 
-interface IndexPageProps {
-  fileList: FileItem[]
-  setFileList: React.Dispatch<React.SetStateAction<FileItem[]>>
-}
-
-function IndexPage({ fileList, setFileList }: IndexPageProps) {
+function IndexPage() {
+  // 从Zustand store获取文件列表和操作方法
+  const { fileList, setFileList, updateFile, removeFile, clearFiles, moveFile, swapFiles } = useAppStore();
 
 
 
   // 更新文件的开始时间或结束时间
   const updateFileTime = (key: string, field: 'startTime' | 'endTime', value: string) => {
-    setFileList(prevList =>
-      prevList.map(file =>
-        file.key === key ? { ...file, [field]: value } : file
-      )
-    )
+    updateFile(key, { [field]: value })
   }
 
   // 表格列配置
@@ -91,7 +84,6 @@ function IndexPage({ fileList, setFileList }: IndexPageProps) {
       order: fileList.length + 1,
       fileName: `新视频${fileList.length + 1}.mp4`,
       filePath: `D:\\Videos\\新视频${fileList.length + 1}.mp4`,
-      duration: '00:00:00',
       startTime: '00:00:00',
       endTime: '00:00:00'
     }
@@ -108,15 +100,7 @@ function IndexPage({ fileList, setFileList }: IndexPageProps) {
       return
     }
 
-    const newFileList = fileList.filter(file => !selectedRowKeys.includes(file.key))
-
-    // 重新排序序号
-    const sortedList = newFileList.map((file, index) => ({
-      ...file,
-      order: index + 1
-    }))
-
-    setFileList(sortedList)
+    selectedRowKeys.forEach(key => removeFile(key.toString()))
     setSelectedRowKeys([])
     message.success('已移除选中的文件')
   }
@@ -136,17 +120,7 @@ function IndexPage({ fileList, setFileList }: IndexPageProps) {
       return
     }
 
-    const newFileList = [...fileList]
-    // 交换位置
-    const temp = newFileList[index]
-    newFileList[index] = newFileList[index - 1]
-    newFileList[index - 1] = temp
-
-    // 更新序号
-    newFileList[index].order = index + 1
-    newFileList[index - 1].order = index
-
-    setFileList(newFileList)
+    moveFile(key, 'up')
     message.success('文件已向上移动')
   }
 
@@ -165,17 +139,7 @@ function IndexPage({ fileList, setFileList }: IndexPageProps) {
       return
     }
 
-    const newFileList = [...fileList]
-    // 交换位置
-    const temp = newFileList[index]
-    newFileList[index] = newFileList[index + 1]
-    newFileList[index + 1] = temp
-
-    // 更新序号
-    newFileList[index].order = index + 1
-    newFileList[index + 1].order = index + 2
-
-    setFileList(newFileList)
+    moveFile(key, 'down')
     message.success('文件已向下移动')
   }
 
@@ -186,10 +150,75 @@ function IndexPage({ fileList, setFileList }: IndexPageProps) {
       return
     }
 
-    setFileList([])
+    clearFiles()
     setSelectedRowKeys([])
     message.success('已清除所有文件')
   }
+
+  // 拖拽排序相关功能
+  const [draggedKey, setDraggedKey] = useState<string | null>(null);
+  const [dragOverKey, setDragOverKey] = useState<string | null>(null);
+
+  const handleDragStart = (e: React.DragEvent, key: string) => {
+    setDraggedKey(key);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', key); // 设置拖拽数据
+  };
+
+  // 拖拽结束
+  const handleDragEnd = () => {
+    setDraggedKey(null);
+    setDragOverKey(null);
+  };
+
+  // 拖拽进入
+  const handleDragEnter = (e: React.DragEvent, key: string) => {
+    e.preventDefault();
+    setDragOverKey(key);
+  };
+
+  // 允许放置
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  // 拖拽离开
+  const handleDragLeave = () => {
+    setDragOverKey(null);
+  };
+
+  // 放置处理
+  const handleDrop = (e: React.DragEvent, dropKey: string) => {
+    e.preventDefault();
+    setDragOverKey(null);
+
+    if (!draggedKey || draggedKey === dropKey) {
+      return;
+    }
+
+    // 使用store的swapFiles方法交换文件
+    swapFiles(draggedKey, dropKey);
+    setDraggedKey(null);
+    message.success('文件顺序已更新');
+  };
+
+  // 表格行属性设置
+  const rowProps = (record: FileItem) => ({
+    draggable: true,
+    onDragStart: (e: React.DragEvent) => handleDragStart(e, record.key),
+    onDragEnd: handleDragEnd,
+    onDragOver: handleDragOver,
+    onDragEnter: (e: React.DragEvent) => handleDragEnter(e, record.key),
+    onDragLeave: handleDragLeave,
+    onDrop: (e: React.DragEvent) => handleDrop(e, record.key),
+    style: {
+      cursor: 'move',
+      opacity: draggedKey === record.key ? 0.5 : 1,
+      backgroundColor: dragOverKey === record.key ? '#f0f0f0' : 'transparent',
+      transition: 'all 0.2s ease'
+    }
+  });
 
   return (
     <div className="p-4">
@@ -204,6 +233,7 @@ function IndexPage({ fileList, setFileList }: IndexPageProps) {
         bordered
         className="mb-4 h-400px"
         scroll={{ y: 300 }}
+        onRow={rowProps}
       />
 
       {/* 按钮区域 */}
