@@ -7,40 +7,8 @@ import GuidePage from "./pages/guide";
 import AboutPage from "./pages/about";
 import { Flex } from "antd";
 
-// 定义文件项接口
-export interface FileItem {
-  key: string
-  order: number
-  fileName: string
-  filePath?: string
-  duration: string
-  startTime: string
-  endTime: string
-}
-
 function App() {
   const [activeNavId, setActiveNavId] = useState('index');
-  // 提升文件列表状态到App组件
-  const [fileList, setFileList] = useState<FileItem[]>([
-    {
-      key: '1',
-      order: 1,
-      fileName: '示例视频1.mp4',
-      filePath: 'D:\\Videos\\示例视频1.mp4',
-      duration: '00:10:30',
-      startTime: '00:00:00',
-      endTime: '00:01:00'
-    },
-    {
-      key: '2',
-      order: 2,
-      fileName: '示例视频2.mp4',
-      filePath: 'D:\\Videos\\示例视频2.mp4',
-      duration: '00:05:20',
-      startTime: '00:00:30',
-      endTime: '00:02:15'
-    }
-  ]);
 
   // 处理导航项变化的回调函数
   const handleNavChange = (id: string) => {
@@ -54,12 +22,12 @@ function App() {
     {
       title: '素材设置',
       id: 'index',
-      page: () => <IndexPage fileList={fileList} setFileList={setFileList} />,
+      page: () => <IndexPage />,
     },
     {
       title: '导出设置',
       id: 'export',
-      page: () => <ExportPage fileList={fileList} />,
+      page: () => <ExportPage />,
     },
     {
       title: "使用说明",

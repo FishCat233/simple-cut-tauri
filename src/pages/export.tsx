@@ -1,29 +1,25 @@
 
-import { useState, useEffect } from 'react';
-import { Flex, Form, Input, Button, Checkbox, Alert, Select, Space, Card } from 'antd';
+import { useState } from 'react';
+import { Flex, Form, Input, Button, Checkbox, Alert, Space, Card, InputNumber } from 'antd';
 import { MessageOutlined, DownloadOutlined } from '@ant-design/icons';
-import { FileItem } from '../App';
+import { useAppStore } from '../store';
 
-const { Option } = Select;
+function ExportPage() {
+  // 从Zustand store获取导出设置和操作方法
+  const { fileList, exportSettings, setExportSettings } = useAppStore();
 
-interface ExportPageProps {
-  fileList: FileItem[];
-}
-
-function ExportPage({ fileList }: ExportPageProps) {
   // 表单状态
   const [form] = Form.useForm();
+
+  // 导出状态
   const [exporting, setExporting] = useState(false);
 
-  // 导出码率选项
-  const bitrateOptions = [
-    { value: '1000', label: '1000 kbps' },
-    { value: '2000', label: '2000 kbps' },
-    { value: '3000', label: '3000 kbps' },
-    { value: '5000', label: '5000 kbps' },
-    { value: '8000', label: '8000 kbps' },
-    { value: '10000', label: '10000 kbps' },
-  ];
+  // 当表单值变化时更新store
+  const handleValuesChange = (_: any, values: any) => {
+    setExportSettings(values as any);
+  };
+
+
 
   // 导出处理函数
   const handleExport = () => {
@@ -77,13 +73,8 @@ function ExportPage({ fileList }: ExportPageProps) {
         <Form
           form={form}
           layout="vertical"
-          initialValues={{
-            fileName: 'output',
-            bitrate: '3000',
-            exportPath: '',
-            mergeAudioTracks: false,
-            useFirstVideoPath: false,
-          }}
+          initialValues={exportSettings}
+          onValuesChange={handleValuesChange}
         >
           {/* 导出文件名 */}
           <Form.Item
@@ -98,15 +89,21 @@ function ExportPage({ fileList }: ExportPageProps) {
           <Form.Item
             name="bitrate"
             label="导出码率"
-            rules={[{ required: true, message: '请选择导出码率' }]}
+            rules={[
+              { required: true, message: '请输入导出码率' },
+              { type: 'number', min: 0.5, message: '码率不能低于0.5 mbps' },
+              { validator: (_, value) => value && value > 1000 ? Promise.reject(new Error('码率不能超过1000 mbps')) : Promise.resolve() }
+            ]}
           >
-            <Select placeholder="请选择导出码率">
-              {bitrateOptions.map(option => (
-                <Option key={option.value} value={option.value}>
-                  {option.label}
-                </Option>
-              ))}
-            </Select>
+            <InputNumber
+              placeholder="请输入导出码率 (mbps)"
+              suffix="mbps"
+              style={{ width: '100%' }}
+              min={0.5}
+              max={1000}
+              step={1}
+              changeOnWheel
+            />
           </Form.Item>
 
           {/* 导出路径 */}
@@ -126,7 +123,9 @@ function ExportPage({ fileList }: ExportPageProps) {
             name="useFirstVideoPath"
             valuePropName="checked"
           >
-            <Checkbox onChange={(e) => handleUseFirstVideoPath(e.target.checked)} disabled={fileList.length === 0}>
+            <Checkbox onChange={(e) => handleUseFirstVideoPath(e.target.checked)}
+              disabled={fileList.length === 0}
+            >
               默认第一个视频路径为导出路径
             </Checkbox>
           </Form.Item>
