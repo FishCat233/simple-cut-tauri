@@ -1,33 +1,14 @@
 import { create } from 'zustand';
-
-// 文件项接口
-export interface FileItem {
-  key: string;
-  order: number;
-  fileName: string;
-  filePath: string;
-  startTime?: string;
-  endTime?: string;
-  outputPath?: string;
-}
-
-// 导出设置接口
-export interface ExportSettings {
-  fileName: string;
-  bitrate: number;
-  exportPath: string;
-  mergeAudioTracks: boolean;
-  useFirstVideoPath: boolean;
-}
+import { ExportSettings, VideoSlice } from './apis/types';
 
 // Store状态接口
 interface AppStore {
   // 文件列表状态
-  fileList: FileItem[];
-  setFileList: (files: FileItem[]) => void;
-  addFile: (file: FileItem) => void;
+  fileList: VideoSlice[];
+  setFileList: (files: VideoSlice[]) => void;
+  addFile: (file: VideoSlice) => void;
   removeFile: (key: string) => void;
-  updateFile: (key: string, updates: Partial<FileItem>) => void;
+  updateFile: (key: string, updates: Partial<VideoSlice>) => void;
   clearFiles: () => void;
   moveFile: (key: string, direction: 'up' | 'down') => void;
   swapFiles: (key1: string, key2: string) => void;
