@@ -22,6 +22,15 @@ impl TaskStatus {
     }
 }
 
+/// 任务类型枚举
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum TaskType {
+    ClipVideo,
+    MergeVideos,
+    ConvertFormat,
+    ExtractAudio,
+}
+
 /// 任务进度信息
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TaskProgress {
@@ -36,6 +45,7 @@ pub struct TaskProgress {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TaskInfo {
     pub id: Uuid,
+    pub task_type: TaskType,
     pub status: TaskStatus,
     pub progress: TaskProgress,
     pub created_at: SystemTime,
@@ -49,6 +59,7 @@ pub struct TaskInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TaskSummary {
     pub id: Uuid,
+    pub task_type: TaskType,
     pub status: TaskStatus,
     pub progress: f32,
     pub created_at: SystemTime,
