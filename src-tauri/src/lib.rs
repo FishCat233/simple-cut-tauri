@@ -1,4 +1,7 @@
 use log::info;
+mod command;
+mod core;
+mod media_info;
 
 // 旧的greet命令保持不变，作为示例
 #[tauri::command]
@@ -23,6 +26,9 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             // 旧的greet命令
             greet,
+            // 执行命令行
+            command::execute_command_line,
+            core::export::export // 导出视频切片
         ])
         // 运行应用
         .run(tauri::generate_context!())

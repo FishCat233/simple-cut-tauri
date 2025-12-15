@@ -3478,9 +3478,11 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "env_logger",
+ "lazy_static",
  "log",
  "serde",
  "serde_json",
+ "shlex",
  "tauri",
  "tauri-build",
  "tauri-plugin-opener",
