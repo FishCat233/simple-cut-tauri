@@ -3,6 +3,7 @@ import { Table, Input, Button, Space, message } from "antd";
 import type { ColumnType } from "antd/es/table";
 import { useAppStore } from "../store";
 import { VideoSlice } from "../types/export";
+import { open } from "@tauri-apps/plugin-dialog";
 
 function IndexPage() {
   // 从Zustand store获取文件列表和操作方法
@@ -91,21 +92,37 @@ function IndexPage() {
   };
 
   // 添加文件
-  const handleAddFile = () => {
-    // 示例：添加一个新文件，序号自动加1
-    // TODO: tauri api dialog 打开文件选择对话框，获取真实的文件路径
-    const newFile: VideoSlice = {
-      key: Date.now().toString(),
-      order: fileList.length + 1,
-      fileName: `新视频${fileList.length + 1}.mp4`,
-      filePath: `D:\\Videos\\新视频${fileList.length + 1}.mp4`,
-      startTime: "00:00:00",
-      endTime: "00:00:00",
-    };
+  const handleAddFile = async () => {
+    // 打开文件选择对话框，允许选择多个文件
+    let selected = await open({
+      title: "选择视频文件",
+      multiple: true,
+    });
 
-    setFileList([...fileList, newFile]);
+    if (!selected) {
+      message.warning("请选择文件");
+      return;
+    }
+
+    if (!Array.isArray(selected)) {
+      selected = [selected];
+    }
+
+    // 添加选中的文件到文件列表
+    selected.forEach((filePath) => {
+      const newFile: VideoSlice = {
+        key: Date.now().toString(),
+        order: fileList.length + 1,
+        fileName: filePath.split("\\").pop() || "新视频.mp4",
+        filePath: filePath,
+        startTime: "00:00:00",
+        endTime: "00:00:00",
+      };
+
+      setFileList([...fileList, newFile]);
+    });
+
     message.success("已添加新文件");
-    // 实际实现时，这里可以打开文件选择对话框，获取真实的文件路径
   };
 
   // 移除文件
