@@ -10,6 +10,7 @@ type NavItem = {
 }
 
 type NavProps = {
+  activeId: string
   config: NavConfig
   className?: string
   style?: React.CSSProperties
@@ -17,7 +18,7 @@ type NavProps = {
 }
 
 function Nav(prop: NavProps) {
-  const [activeId, setActiveId] = useState('index')
+  const [activeId, setActiveId] = useState(prop.activeId)
 
   const handleClick = (id: string) => {
     setActiveId(id)

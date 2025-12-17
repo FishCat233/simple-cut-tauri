@@ -7,6 +7,7 @@ interface AppStore {
   fileList: VideoSlice[];
   setFileList: (files: VideoSlice[]) => void;
   addFile: (file: VideoSlice) => void;
+  appendFileByPaths: (paths: string[]) => void;
   removeFile: (key: string) => void;
   updateFile: (key: string, updates: Partial<VideoSlice>) => void;
   clearFiles: () => void;
@@ -34,6 +35,24 @@ export const useAppStore = create<AppStore>((set) => ({
     set((state) => ({
       fileList: [...state.fileList, file],
     })),
+
+  appendFileByPaths: (paths: string[]) =>
+    set((state) => {
+      const currentLength = state.fileList.length;
+      return {
+        fileList: [
+          ...state.fileList,
+          ...paths.map((filePath, index) => ({
+            key: filePath,
+            order: currentLength + index + 1,
+            fileName: filePath.split(/[\\/]/).pop() || "unknown",
+            filePath,
+            startTime: undefined,
+            endTime: undefined,
+          })),
+        ],
+      };
+    }),
 
   removeFile: (key) =>
     set((state) => ({
