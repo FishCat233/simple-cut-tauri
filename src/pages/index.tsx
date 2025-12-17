@@ -1,160 +1,174 @@
-
-import { useState } from 'react'
-import { Table, Input, Button, Space, message } from 'antd'
-import type { ColumnType } from 'antd/es/table'
-import { useAppStore } from '../store'
-import { VideoSlice } from '../types/export'
+import { useState } from "react";
+import { Table, Input, Button, Space, message } from "antd";
+import type { ColumnType } from "antd/es/table";
+import { useAppStore } from "../store";
+import { VideoSlice } from "../types/export";
 
 function IndexPage() {
   // 从Zustand store获取文件列表和操作方法
-  const { fileList, setFileList, updateFile, removeFile, clearFiles, moveFile, swapFiles } = useAppStore();
-
-
+  const {
+    fileList,
+    setFileList,
+    updateFile,
+    removeFile,
+    clearFiles,
+    moveFile,
+    swapFiles,
+  } = useAppStore();
 
   // 更新文件的开始时间或结束时间
-  const updateFileTime = (key: string, field: 'startTime' | 'endTime', value: string) => {
-    updateFile(key, { [field]: value })
-  }
+  const updateFileTime = (
+    key: string,
+    field: "startTime" | "endTime",
+    value: string
+  ) => {
+    updateFile(key, { [field]: value });
+  };
 
   // 表格列配置
   const columns: ColumnType<VideoSlice>[] = [
     {
-      title: '序号',
-      dataIndex: 'order',
-      key: 'order',
-      width: 60
+      title: "序号",
+      dataIndex: "order",
+      key: "order",
+      width: 60,
     },
     {
-      title: '文件名',
-      dataIndex: 'fileName',
-      key: 'fileName',
-      width: 200
+      title: "文件名",
+      dataIndex: "fileName",
+      key: "fileName",
+      width: 200,
     },
     {
-      title: '文件时长',
-      dataIndex: 'duration',
-      key: 'duration',
-      width: 120
+      title: "文件时长",
+      dataIndex: "duration",
+      key: "duration",
+      width: 120,
     },
     {
-      title: '开始时间',
-      dataIndex: 'startTime',
-      key: 'startTime',
+      title: "开始时间",
+      dataIndex: "startTime",
+      key: "startTime",
       width: 150,
       render: (text, record) => (
         <Input
           placeholder="00:00:00"
           value={text}
-          onChange={(e) => updateFileTime(record.key, 'startTime', e.target.value)}
+          onChange={(e) =>
+            updateFileTime(record.key, "startTime", e.target.value)
+          }
           size="small"
         />
-      )
+      ),
     },
     {
-      title: '结束时间',
-      dataIndex: 'endTime',
-      key: 'endTime',
+      title: "结束时间",
+      dataIndex: "endTime",
+      key: "endTime",
       width: 150,
       render: (text, record) => (
         <Input
           placeholder="00:00:00"
           value={text}
-          onChange={(e) => updateFileTime(record.key, 'endTime', e.target.value)}
+          onChange={(e) =>
+            updateFileTime(record.key, "endTime", e.target.value)
+          }
           size="small"
         />
-      )
-    }
-  ]
+      ),
+    },
+  ];
 
   // 选中的行
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   // 表格选择配置
   const rowSelection = {
     selectedRowKeys,
     onChange: (newSelectedRowKeys: React.Key[]) => {
-      setSelectedRowKeys(newSelectedRowKeys)
-    }
-  }
+      setSelectedRowKeys(newSelectedRowKeys);
+    },
+  };
 
   // 添加文件
   const handleAddFile = () => {
     // 示例：添加一个新文件，序号自动加1
+    // TODO: tauri api dialog 打开文件选择对话框，获取真实的文件路径
     const newFile: VideoSlice = {
       key: Date.now().toString(),
       order: fileList.length + 1,
       fileName: `新视频${fileList.length + 1}.mp4`,
       filePath: `D:\\Videos\\新视频${fileList.length + 1}.mp4`,
-      startTime: '00:00:00',
-      endTime: '00:00:00'
-    }
+      startTime: "00:00:00",
+      endTime: "00:00:00",
+    };
 
-    setFileList([...fileList, newFile])
-    message.success('已添加新文件')
+    setFileList([...fileList, newFile]);
+    message.success("已添加新文件");
     // 实际实现时，这里可以打开文件选择对话框，获取真实的文件路径
-  }
+  };
 
   // 移除文件
   const handleRemoveFile = () => {
     if (selectedRowKeys.length === 0) {
-      message.warning('请先选择要移除的文件')
-      return
+      message.warning("请先选择要移除的文件");
+      return;
     }
 
-    selectedRowKeys.forEach(key => removeFile(key.toString()))
-    setSelectedRowKeys([])
-    message.success('已移除选中的文件')
-  }
+    selectedRowKeys.forEach((key) => removeFile(key.toString()));
+    setSelectedRowKeys([]);
+    message.success("已移除选中的文件");
+  };
 
   // 向上移动
   const handleMoveUp = () => {
     if (selectedRowKeys.length !== 1) {
-      message.warning('请选择一个文件进行移动')
-      return
+      message.warning("请选择一个文件进行移动");
+      return;
     }
 
-    const key = selectedRowKeys[0] as string
-    const index = fileList.findIndex(file => file.key === key)
+    const key = selectedRowKeys[0] as string;
+    const index = fileList.findIndex((file) => file.key === key);
 
     if (index === 0) {
-      message.warning('已经是第一个文件了')
-      return
+      message.warning("已经是第一个文件了");
+      return;
     }
 
-    moveFile(key, 'up')
-    message.success('文件已向上移动')
-  }
+    moveFile(key, "up");
+    message.success("文件已向上移动");
+  };
 
   // 向下移动
   const handleMoveDown = () => {
     if (selectedRowKeys.length !== 1) {
-      message.warning('请选择一个文件进行移动')
-      return
+      message.warning("请选择一个文件进行移动");
+      return;
     }
 
-    const key = selectedRowKeys[0] as string
-    const index = fileList.findIndex(file => file.key === key)
+    const key = selectedRowKeys[0] as string;
+    const index = fileList.findIndex((file) => file.key === key);
 
     if (index === fileList.length - 1) {
-      message.warning('已经是最后一个文件了')
-      return
+      message.warning("已经是最后一个文件了");
+      return;
     }
 
-    moveFile(key, 'down')
-    message.success('文件已向下移动')
-  }
+    moveFile(key, "down");
+    message.success("文件已向下移动");
+  };
 
   // 清除全部
   const handleClearAll = () => {
     if (fileList.length === 0) {
-      message.info('文件列表已经是空的')
-      return
+      message.info("文件列表已经是空的");
+      return;
     }
 
-    clearFiles()
-    setSelectedRowKeys([])
-    message.success('已清除所有文件')
-  }
+    clearFiles();
+    setSelectedRowKeys([]);
+    message.success("已清除所有文件");
+  };
 
   // 拖拽排序相关功能
   const [draggedKey, setDraggedKey] = useState<string | null>(null);
@@ -162,8 +176,8 @@ function IndexPage() {
 
   const handleDragStart = (e: React.DragEvent, key: string) => {
     setDraggedKey(key);
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', key); // 设置拖拽数据
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", key); // 设置拖拽数据
   };
 
   // 拖拽结束
@@ -181,7 +195,7 @@ function IndexPage() {
   // 允许放置
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
+    e.dataTransfer.dropEffect = "move";
   };
 
   // 拖拽离开
@@ -201,7 +215,7 @@ function IndexPage() {
     // 使用store的swapFiles方法交换文件
     swapFiles(draggedKey, dropKey);
     setDraggedKey(null);
-    message.success('文件顺序已更新');
+    message.success("文件顺序已更新");
   };
 
   // 表格行属性设置
@@ -214,11 +228,11 @@ function IndexPage() {
     onDragLeave: handleDragLeave,
     onDrop: (e: React.DragEvent) => handleDrop(e, record.key),
     style: {
-      cursor: 'move',
+      cursor: "move",
       opacity: draggedKey === record.key ? 0.5 : 1,
-      backgroundColor: dragOverKey === record.key ? '#f0f0f0' : 'transparent',
-      transition: 'all 0.2s ease'
-    }
+      backgroundColor: dragOverKey === record.key ? "#f0f0f0" : "transparent",
+      transition: "all 0.2s ease",
+    },
   });
 
   return (
@@ -240,15 +254,21 @@ function IndexPage() {
       {/* 按钮区域 */}
       <div className="mt-4">
         <Space>
-          <Button type="primary" onClick={handleAddFile}>添加文件</Button>
-          <Button danger onClick={handleRemoveFile}>移除文件</Button>
+          <Button type="primary" onClick={handleAddFile}>
+            添加文件
+          </Button>
+          <Button danger onClick={handleRemoveFile}>
+            移除文件
+          </Button>
           <Button onClick={handleMoveUp}>向上移动</Button>
           <Button onClick={handleMoveDown}>向下移动</Button>
-          <Button danger onClick={handleClearAll}>清除全部</Button>
+          <Button danger onClick={handleClearAll}>
+            清除全部
+          </Button>
         </Space>
       </div>
     </div>
-  )
+  );
 }
 
-export default IndexPage
+export default IndexPage;
