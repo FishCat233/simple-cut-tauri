@@ -2,7 +2,8 @@
 import { useState } from 'react'
 import { Table, Input, Button, Space, message } from 'antd'
 import type { ColumnType } from 'antd/es/table'
-import { useAppStore, FileItem } from '../store'
+import { useAppStore } from '../store'
+import { VideoSlice } from '../types/export'
 
 function IndexPage() {
   // 从Zustand store获取文件列表和操作方法
@@ -16,7 +17,7 @@ function IndexPage() {
   }
 
   // 表格列配置
-  const columns: ColumnType<FileItem>[] = [
+  const columns: ColumnType<VideoSlice>[] = [
     {
       title: '序号',
       dataIndex: 'order',
@@ -79,7 +80,7 @@ function IndexPage() {
   // 添加文件
   const handleAddFile = () => {
     // 示例：添加一个新文件，序号自动加1
-    const newFile: FileItem = {
+    const newFile: VideoSlice = {
       key: Date.now().toString(),
       order: fileList.length + 1,
       fileName: `新视频${fileList.length + 1}.mp4`,
@@ -204,7 +205,7 @@ function IndexPage() {
   };
 
   // 表格行属性设置
-  const rowProps = (record: FileItem) => ({
+  const rowProps = (record: VideoSlice) => ({
     draggable: true,
     onDragStart: (e: React.DragEvent) => handleDragStart(e, record.key),
     onDragEnd: handleDragEnd,

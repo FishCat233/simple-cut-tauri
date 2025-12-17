@@ -9,6 +9,7 @@
     "core:default",
     "opener:default",
     "process:default",
-    "shell:default"
+    "shell:default",
+    "dialog:default"
   ]
 }

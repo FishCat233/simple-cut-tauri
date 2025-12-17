@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ExportSettings, VideoSlice } from './apis/types';
+import { ExportSettings, VideoSlice } from './types/export';
 
 // Store状态接口
 interface AppStore {
@@ -84,8 +84,9 @@ export const useAppStore = create<AppStore>((set) => ({
   exportSettings: {
     fileName: 'output',
     bitrate: 6,
+    sizeControlType: 'mbps',
+    audioMergeType: 'none',
     exportPath: '',
-    mergeAudioTracks: false,
     useFirstVideoPath: true
   },
 

@@ -17,6 +17,7 @@ pub fn run() {
     info!("Starting Simple Cut Tauri application...");
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
         // 注册插件
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_opener::init())
