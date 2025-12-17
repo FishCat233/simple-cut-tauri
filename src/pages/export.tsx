@@ -4,7 +4,8 @@ import { Flex, Form, Input, Button, Checkbox, Alert, Space, Card, InputNumber, S
 import { MessageOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useAppStore } from '../store';
 import { exportVideoSlices } from '../apis/core';
-import { VideoSlice, ExportSettings } from '../types/export';
+import { VideoSlice, exportSettingsSchema } from '../types/export';
+import { z } from 'zod';
 import { open } from '@tauri-apps/plugin-dialog';
 
 function ExportPage() {
@@ -25,32 +26,54 @@ function ExportPage() {
 
   // 当表单值变化时更新store
   const handleValuesChange = (_: any, values: any) => {
-    setExportSettings(values as any);
+    // 使用zod schema的类型定义，确保类型安全
+    setExportSettings(values as z.infer<typeof exportSettingsSchema>);
   };
 
 
 
   // 导出处理函数
   const handleExport = () => {
-    form.validateFields()
-      .then(values => {
-        console.log('导出参数:', values);
-        setExporting(true);
+    const values = form.getFieldsValue();
+    console.log('导出参数:', values);
 
-        // 调用后端导出API
-        exportVideoSlices(fileList as VideoSlice[], values as ExportSettings)
-          .then(() => {
-            setExporting(false);
-            alert('导出成功！');
-          })
-          .catch(error => {
-            setExporting(false);
-            console.error('导出失败:', error);
-            alert(`导出失败: ${error}`);
-          });
+    // 使用Zod验证导出参数
+    const result = exportSettingsSchema.safeParse(values);
+
+    console.log('验证结果:', result);
+
+    if (!result.success) {
+      // 提取错误信息并设置到表单
+      const errors: Record<string, string[]> = {};
+      result.error.issues.forEach(issue => {
+        const field = issue.path[0] as string;
+        if (!errors[field]) {
+          errors[field] = [];
+        }
+        errors[field].push(issue.message);
+      });
+
+      // 设置表单错误
+      form.setFields(Object.entries(errors).map(([field, messages]) => ({
+        name: field,
+        errors: messages
+      })));
+
+      return;
+    }
+
+    // 验证通过，调用后端API
+    setExporting(true);
+
+    exportVideoSlices(fileList as VideoSlice[], result.data)
+      .then(() => {
+        setExporting(false);
+        alert('导出成功！');
       })
-      .catch(info => {
-        console.log('表单验证失败:', info);
+      .catch(error => {
+        setExporting(false);
+        console.error('导出失败:', error);
+        alert(`导出失败: ${error}`);
       });
   };
 
