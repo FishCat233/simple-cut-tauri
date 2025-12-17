@@ -54,7 +54,7 @@ function IndexPage() {
       width: 150,
       render: (text, record) => (
         <Input
-          placeholder="00:00:00"
+          placeholder="开头"
           value={text}
           onChange={(e) =>
             updateFileTime(record.key, "startTime", e.target.value)
@@ -70,7 +70,7 @@ function IndexPage() {
       width: 150,
       render: (text, record) => (
         <Input
-          placeholder="00:00:00"
+          placeholder="结尾"
           value={text}
           onChange={(e) =>
             updateFileTime(record.key, "endTime", e.target.value)
@@ -116,8 +116,8 @@ function IndexPage() {
         order: fileList.length + 1,
         fileName: basename(filePath),
         filePath: filePath,
-        startTime: "00:00:00",
-        endTime: "00:00:00",
+        startTime: "",
+        endTime: "",
       };
 
       console.log(newFile);
