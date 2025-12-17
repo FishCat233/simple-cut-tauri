@@ -14,6 +14,7 @@ export default function DragAndDrop() {
       const unlisten = webview.onDragDropEvent((event) => {
         if (event.payload.type == "drop") {
           const paths = event.payload.paths;
+          console.log(paths);
           appendFileByPaths(paths);
           message.success(`成功添加 ${paths.length} 个文件`);
         }

@@ -4,6 +4,7 @@ import type { ColumnType } from "antd/es/table";
 import { useAppStore } from "../store";
 import { VideoSlice } from "../types/export";
 import { open } from "@tauri-apps/plugin-dialog";
+import path from "path-browserify";
 
 function IndexPage() {
   // 从Zustand store获取文件列表和操作方法
@@ -110,10 +111,11 @@ function IndexPage() {
 
     // 添加选中的文件到文件列表
     selected.forEach((filePath) => {
+      const filepathParsed = path.parse(filePath);
       const newFile: VideoSlice = {
         key: Date.now().toString(),
         order: fileList.length + 1,
-        fileName: filePath.split("\\").pop() || "新视频.mp4",
+        fileName: filepathParsed.base,
         filePath: filePath,
         startTime: "00:00:00",
         endTime: "00:00:00",
