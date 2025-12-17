@@ -41,9 +41,9 @@ function IndexPage() {
       width: 200,
     },
     {
-      title: "文件时长",
-      dataIndex: "duration",
-      key: "duration",
+      title: "文件路径",
+      dataIndex: "filePath",
+      key: "filePath",
       width: 120,
     },
     {
