@@ -32,9 +32,26 @@ export const useAppStore = create<AppStore>((set) => ({
   setFileList: (files) => set({ fileList: files }),
 
   addFile: (file) =>
-    set((state) => ({
-      fileList: [...state.fileList, file],
-    })),
+    set((state) => {
+      // 确保file有唯一key
+      const hasKey = file.key && file.key.length > 0;
+      const keyExists =
+        hasKey && state.fileList.some((f) => f.key === file.key);
+
+      if (!hasKey || keyExists) {
+        // 生成唯一key
+        const uniqueKey = `${
+          file.filePath || "video"
+        }_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        return {
+          fileList: [...state.fileList, { ...file, key: uniqueKey }],
+        };
+      }
+
+      return {
+        fileList: [...state.fileList, file],
+      };
+    }),
 
   appendFileByPaths: (paths: string[]) =>
     set((state) => {
@@ -43,9 +60,11 @@ export const useAppStore = create<AppStore>((set) => ({
         fileList: [
           ...state.fileList,
           ...paths.map((filePath, index) => ({
-            key: filePath,
+            key: `video_${Date.now()}_${index}_${Math.random()
+              .toString(36)
+              .substring(2, 11)}`,
             order: currentLength + index + 1,
-            fileName: filePath.split(/[\\/]/).pop() || "unknown",
+            fileName: filePath.split(/[\/]/).pop() || "unknown",
             filePath,
             startTime: undefined,
             endTime: undefined,
