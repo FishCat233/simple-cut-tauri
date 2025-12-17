@@ -42,12 +42,6 @@ function IndexPage() {
       width: 200,
     },
     {
-      title: "文件路径",
-      dataIndex: "filePath",
-      key: "filePath",
-      width: 120,
-    },
-    {
       title: "开始时间",
       dataIndex: "startTime",
       key: "startTime",
@@ -78,6 +72,11 @@ function IndexPage() {
           size="small"
         />
       ),
+    },
+    {
+      title: "文件路径",
+      dataIndex: "filePath",
+      key: "filePath",
     },
   ];
 
@@ -267,7 +266,7 @@ function IndexPage() {
         pagination={false}
         bordered
         className="mb-4 h-400px"
-        scroll={{ y: 300 }}
+        scroll={{ x: 1000, y: 300 }}
         onRow={rowProps}
       />
 
