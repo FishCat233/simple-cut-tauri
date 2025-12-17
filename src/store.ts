@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { ExportSettings, VideoSlice } from "./types/export";
-import path from "path-browserify";
+import { basename } from "pathe";
 
 // Store状态接口
 interface AppStore {
@@ -61,14 +61,12 @@ export const useAppStore = create<AppStore>((set) => ({
         fileList: [
           ...state.fileList,
           ...paths.map((filePath, index) => {
-            const filepathParsed = path.parse(filePath);
-
             return {
               key: `video_${Date.now()}_${index}_${Math.random()
                 .toString(36)
                 .substring(2, 11)}`,
               order: currentLength + index + 1,
-              fileName: filepathParsed.base || "unknown",
+              fileName: basename(filePath),
               filePath: filePath,
               startTime: undefined,
               endTime: undefined,
